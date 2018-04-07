@@ -1,93 +1,110 @@
-// Here is mine
 /**
- * Definition for singly-linked list.
- * struct ListNode {
- *     int val;
- *     ListNode *next;
- *     ListNode(int x) : val(x), next(NULL) {}
- * };
- */
+ * 2. https://leetcode.com/problems/add-two-numbers/description/ 
+ 
+ * You are given two non-empty linked lists representing two non-negative integers. The digits are stored in reverse order and each of their nodes contain a single digit. Add the two numbers and return it as a linked list.
+ * You may assume the two numbers do not contain any leading zero, except the number 0 itself.
+ 
+ * Example
+ * Input: (2 -> 4 -> 3) + (5 -> 6 -> 4)
+ * Output: 7 -> 0 -> 8
+ * Explanation: 342 + 465 = 807.
+ **/
+
+
+#include<iostream>
+#include<cstdlib>
+
+using namespace std;
+
+struct ListNode {
+    int val;
+    ListNode *next;
+    ListNode(int x) : val(x), next(NULL) {}
+};
+
 class Solution {
 public:
-    int getLength(ListNode* l) {
-        if (NULL == l) {
-            return 0;
-        }
-        
-        int length = 1;
-        ListNode *temp = l -> next;
-        while (temp != NULL) {
-            length++;
-            temp = temp -> next;
-        }
-        return length;
-    }
-    
     ListNode* addTwoNumbers(ListNode* l1, ListNode* l2) {
-        if (l1 == NULL && l2 == NULL) {
-            return NULL;
-        } else if (l1 == NULL) {
+        ListNode* temp1 = l1;
+        ListNode* temp2 = l2;
+        
+        int len1 = getLength(l1);
+        int len2 = getLength(l2);
+        
+        if(!l1) {
             return l2;
-        } else if (l2 == NULL) {
+        } else if (!l2) {
+            return l1;
+        } else if(len1 >= len2) {
+            while(temp2) {
+                temp1 -> val = temp1 -> val + temp2 -> val;
+            
+                if(temp1 -> val >= 10) {
+                    temp1 -> val %= 10;
+                    
+                    if(!temp1 -> next) {
+                        temp1 -> next = (ListNode*)malloc(sizeof(ListNode));
+                        temp1 -> next -> val = 1;
+                        temp1 -> next -> next = NULL;
+                    } else {
+                        temp1 -> next -> val += 1;
+                        changeTen(temp1 -> next);
+                    }
+                }
+            
+                temp1 = temp1 -> next;
+                temp2 = temp2 -> next;
+            }
             return l1;
         } else {
-            int length1 = getLength(l1);
-            int length2 = getLength(l2);
-    
-            if (length1 >= length2) {
-                ListNode* temp = l1;
-                while(temp != NULL && l2 != NULL) {
-                    temp -> val = temp -> val + l2 -> val;
-                    if (temp -> next != NULL && temp -> val > 9) {
-                        temp -> next -> val += 1;
-                    } else if (temp -> next == NULL && temp -> val > 9) {
-                        temp -> next = new ListNode(0);
-                        temp -> next -> val = 1;
-                        temp -> next -> next = NULL;
-                    }
-                    temp -> val %= 10;
-                    temp = temp -> next;
-                    l2 = l2 -> next;
-                }
+            while(temp1) {
+                temp2 -> val = temp2 -> val + temp1 -> val;
                 
-                while (temp != NULL && temp -> val > 9) {
-                    temp -> val = temp -> val % 10;
-                    if (temp -> next == NULL) {
-                        temp -> next = new ListNode(0);
-                    }
-                    temp -> next -> val += 1;
-                    temp = temp -> next;
-                }
-                
-                return l1;
-            } else {
-                ListNode* temp = l2;
-                while (temp != NULL && l1 != NULL) {
-                    temp -> val = temp -> val + l1 -> val;
-                    if (temp -> next != NULL && temp -> val > 9) {
-                        temp -> next -> val += 1;
-                    } else if (temp -> next == NULL && temp -> val > 9) {
-                        temp -> next = new ListNode(0);
-                        temp -> next -> val = 1;
-                        temp -> next -> next = NULL;
-                    }
+                if(temp2 -> val >= 10) {
+                    temp2 -> val %= 10;
                     
-                    temp -> val %= 10;
-                    temp = temp -> next;
-                    l1 = l1 -> next;
-                }
-                
-                while (temp != NULL && temp -> val > 9) {
-                    temp -> val = temp -> val % 10;
-                    if (temp -> next == NULL) {
-                        temp -> next = new ListNode(0);
+                    if(!temp2 -> next) {
+                        temp2 -> next = (ListNode*)malloc(sizeof(ListNode));
+                        temp2 -> next -> val = 1;
+                        temp2 -> next -> next = NULL;
+                    } else {
+                        temp2 -> next -> val += 1;
+                        changeTen(temp2 -> next);
                     }
-                    temp -> next -> val += 1;
-                    temp = temp -> next;
                 }
                 
-                return l2;
+                temp1 = temp1 -> next;
+                temp2 = temp2 -> next;
             }
+            return l2;
+        }
+    }
+    
+    int getLength(ListNode *l) {
+        int count = 0;
+        ListNode* temp = l;
+        
+        while(temp) {
+            count ++;
+            temp = temp -> next;
+        }
+        
+        return count;
+    }
+    
+    void changeTen(ListNode *l) {
+        ListNode *temp = l;
+        while(temp -> val == 10) {
+            temp -> val %= 10;
+            if(temp -> next) {
+                temp -> next -> val += 1;
+            } else {
+                temp -> next = (ListNode*)malloc(sizeof(ListNode));
+                temp -> next -> val = 1;
+                temp -> next -> next = NULL; 
+            }
+            
+            temp = temp -> next;
         }
     }
 };
